@@ -1,0 +1,24 @@
+# Don't send these files (or types of files) to Github
+# macos specific files
+.DS_Store
+
+# secret keys
+*.key
+
+# compiled Java files (your computer will make these during compilation)
+*.class
+
+# Gradle build files
+.gradle
+build/
+
+# other computer-specific settings and files
+bin/
+.project
+.classpath
+
+# Compiled Java jars (but not gradle-wrapper.jar)
+*.jar
+!gradle-wrapper.jar
+
+# Note: I'm choosing to keep .vscode on purpose so others have to use the same formatting rules
