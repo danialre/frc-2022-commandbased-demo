@@ -24,8 +24,8 @@ public final class Constants {
     // ## Let's also keep buttons in one place so it's easy to keep track of them
     public static class Buttons {
         // ## Button to move forward/repeat the Autonomous command
-        public static final int FORWARD_BUTTON = 2;
+        public static final int FORWARD_BUTTON = 3;
         // ## Button that does nothing except schedule a useless command
-        public static final int NOTHING_BUTTON = 3;
+        public static final int NOTHING_BUTTON = 2;
     }
 }
