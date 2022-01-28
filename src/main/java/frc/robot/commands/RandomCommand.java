@@ -23,9 +23,9 @@ public class RandomCommand extends CommandBase {
 
         // ## Make a new timer here so we can keep track of time in this command.
         timer = new Timer();
-        y = Math.random();
-        x = Math.random();
-        r = Math.random();
+        y = (Math.random() * 2) - 1;
+        x = (Math.random() * 2) - 1;
+        r = (Math.random() * 2) - 1;
     }
 
     // Called when the command is initially scheduled.
