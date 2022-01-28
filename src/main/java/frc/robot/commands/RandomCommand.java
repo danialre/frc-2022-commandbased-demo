@@ -23,6 +23,7 @@ public class RandomCommand extends CommandBase {
 
         // ## Make a new timer here so we can keep track of time in this command.
         timer = new Timer();
+        // math from -1 to +1
         y = (Math.random() * 2) - 1;
         x = (Math.random() * 2) - 1;
         r = (Math.random() * 2) - 1;
