@@ -45,6 +45,8 @@ public class DriveCommand extends CommandBase {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
+        // ## Stop the robot from moving whenever it is disabled
+        m_drivesubsystem.Drive(0, 0, 0);
     }
 
     // Returns true when the command should end.

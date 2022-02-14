@@ -17,6 +17,8 @@ public final class Constants {
     // ## I made this class so PWM IDs on the RoboRIO are all in one place
     // (that way we don't accidentally swap or double assign motor controllers)
     public static class PWM_IDs {
+        public static final int LEFT_FRONT = 1;
+        public static final int RIGHT_FRONT = 2;
         public static final int LEFT_REAR = 3;
         public static final int RIGHT_REAR = 4;
     }
