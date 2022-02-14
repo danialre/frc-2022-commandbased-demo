@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.commands.AutonomousPID;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.TimedAutonomous;
@@ -43,6 +44,7 @@ public class RobotContainer {
     private final DriveCommand m_DriveCommand = new DriveCommand(m_drivesubsystem, main_joystick);
     private final TimedAutonomous m_TimedAutonomous = new TimedAutonomous(m_drivesubsystem);
     private final DoNothing m_nothingCommand = new DoNothing();
+    private final AutonomousPID m_AutonomousPID = new AutonomousPID(m_drivesubsystem);
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
@@ -80,6 +82,6 @@ public class RobotContainer {
         // ## I removed the exampleCommand and put m_TimedAutonomous here - this template automatically
         // runs whatever command you return here during Autonomous and cancel's it at the start of
         // Teleoperated.
-        return m_TimedAutonomous;
+        return m_AutonomousPID;
     }
 }
