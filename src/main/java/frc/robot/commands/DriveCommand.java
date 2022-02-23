@@ -5,6 +5,8 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.PS4Controller;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 
@@ -12,10 +14,13 @@ public class DriveCommand extends CommandBase {
     DriveSubsystem m_drivesubsystem;
     // ## Used the PS4Controller (instead of Joystick) because I wanted getLeftX() and getRightX() methods
     // (instead of generic getRawAxis() and guessing the axis IDs)
-    PS4Controller drivejoystick;
+    XboxController drivejoystick;
+
+    double linearMultiplier = 0.04;
+    double angularMultiplier = 0.01;
 
     /** Creates a new DriveCommand. */
-    public DriveCommand(DriveSubsystem subsystem, PS4Controller joystick) {
+    public DriveCommand(DriveSubsystem subsystem, XboxController joystick) {
         // Use addRequirements() here to declare subsystem dependencies.
         m_drivesubsystem = subsystem;
         drivejoystick = joystick;
@@ -28,6 +33,7 @@ public class DriveCommand extends CommandBase {
     public void initialize() {
         // ## Let's see when this pops up in the robot log
         System.out.println("drive command initialized!!");
+        m_drivesubsystem.setPID(0.03, 0, 0);
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -35,9 +41,12 @@ public class DriveCommand extends CommandBase {
     @Override
     public void execute() {
         // ## Here, we access the joystick's axis methods to read driver inputs
-        double y = -drivejoystick.getLeftY(); // ## Remember, pressing up is negative, down is positive
-        double x = drivejoystick.getLeftX();
-        double r = drivejoystick.getRightX();
+        double y = -drivejoystick.getLeftY() * linearMultiplier; // ## Remember, pressing up is negative, down is positive
+        double x = drivejoystick.getLeftX() * linearMultiplier;
+        double r = drivejoystick.getRightX() * angularMultiplier;
+        SmartDashboard.putNumber( "JoyY", y);
+        SmartDashboard.putNumber("JoyX", x);
+        SmartDashboard.putNumber("JoyR", r);
         // ## And here is where we give them to the subsystem
         m_drivesubsystem.Drive(y, x, r);
     }

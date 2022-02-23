@@ -18,7 +18,7 @@ public class AutonomousPID extends CommandBase {
   // @@ Set our target position for this autonomous command in absolute (field) coordinates - 10 meters X, 4 meters Y
   // this will always be the same position (except when changing alliances) no matter where the robot starts. 
   // It is always assumed that the driver station is at X=0, so 10 meters is past the halfway point
-  Pose2d target_position = new Pose2d(10.0, 4.0, new Rotation2d());
+  Pose2d target_position = new Pose2d(7.0, 4.0, new Rotation2d());
 
   /** Creates a new AutonomousPID. */
   public AutonomousPID(DriveSubsystem subsystem) {
@@ -31,6 +31,7 @@ public class AutonomousPID extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    m_driveSubsystem.setPID(0.2, 0, 0);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

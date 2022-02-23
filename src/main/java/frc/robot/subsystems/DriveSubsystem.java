@@ -4,8 +4,10 @@
 
 package frc.robot.subsystems;
 
+import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.REVPhysicsSim;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -19,6 +21,7 @@ import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.simulation.ADXRS450_GyroSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -32,6 +35,7 @@ import frc.robot.Robot;
 public class DriveSubsystem extends SubsystemBase {
     // @@ Use the special CANSparkMaxVelocityPID so we can simulate it (and run position PID control later)
     private final CANSparkMaxVelocityPID left_front, right_front, left_rear, right_rear;
+    private final SparkMaxPIDController lf_PID, rf_PID, lr_PID, rr_PID;
     private final RelativeEncoder lf_encoder, rf_encoder, lr_encoder, rr_encoder;
 
     private final MecanumDrive mechdrive;
@@ -61,12 +65,15 @@ public class DriveSubsystem extends SubsystemBase {
     Pose2d m_pose = new Pose2d(6.0, 4.0, new Rotation2d());
 
     // @@ Set up a gyro object (required for odometry)
-    ADXRS450_Gyro gyro = new ADXRS450_Gyro();
-    // @@ And another object for gyro simulation - this doesn't hurt anything if this is run on the real robot
-    ADXRS450_GyroSim gyro_sim = new ADXRS450_GyroSim(gyro);
+    public AHRS imu = new AHRS();
 
+    public Rotation2d getGyroAngle() {
+       Rotation2d rotation = new Rotation2d(-imu.getYaw() * Math.PI / 180);
+       return rotation;
+    }
+    
     // @@ Odometry object - keeps robot positions when given a series of wheel speeds while the robot is driving
-    MecanumDriveOdometry m_odometry = new MecanumDriveOdometry(m_kinematics, gyro.getRotation2d(), m_pose);
+    MecanumDriveOdometry m_odometry = new MecanumDriveOdometry(m_kinematics, getGyroAngle(), m_pose);
 
     /** Creates a new DriveSubsystem. */
     public DriveSubsystem() {
@@ -86,15 +93,28 @@ public class DriveSubsystem extends SubsystemBase {
         lr_encoder = left_rear.getEncoder();
         rr_encoder = right_rear.getEncoder();
 
+        // @@ PID controller object setups
+        lf_PID = left_front.getPIDController();
+        rf_PID = right_front.getPIDController();
+        lr_PID = left_rear.getPIDController();
+        rr_PID = right_rear.getPIDController();
+
+
+
+
+
         // @@ set conversion factors so we are always reading meters or m/s from the encoders
-        lf_encoder.setVelocityConversionFactor(velocity_multiplier);
-        rf_encoder.setVelocityConversionFactor(velocity_multiplier);
-        lr_encoder.setVelocityConversionFactor(velocity_multiplier);
-        rr_encoder.setVelocityConversionFactor(velocity_multiplier);
-        lf_encoder.setPositionConversionFactor(position_multiplier);
-        rf_encoder.setPositionConversionFactor(position_multiplier);
-        lr_encoder.setPositionConversionFactor(position_multiplier);
-        rr_encoder.setPositionConversionFactor(position_multiplier);
+        lf_encoder.setVelocityConversionFactor(Constants.DriveTrain.velocityConversionRatio);
+        rf_encoder.setVelocityConversionFactor(Constants.DriveTrain.velocityConversionRatio);
+        lr_encoder.setVelocityConversionFactor(Constants.DriveTrain.velocityConversionRatio);
+        rr_encoder.setVelocityConversionFactor(Constants.DriveTrain.velocityConversionRatio);
+
+        lf_encoder.setPositionConversionFactor(Constants.DriveTrain.positionConversionRation);
+        rf_encoder.setPositionConversionFactor(Constants.DriveTrain.positionConversionRation);
+        lr_encoder.setPositionConversionFactor(Constants.DriveTrain.positionConversionRation);
+        rr_encoder.setPositionConversionFactor(Constants.DriveTrain.positionConversionRation);
+
+        
 
         // @@ Set initial encoder positions based on where m_pose is
         // remember, individual wheel positions != robot position
@@ -130,9 +150,12 @@ public class DriveSubsystem extends SubsystemBase {
         // @@ Simulator approximation based on rotation input - maximum 180 degrees per second, or 3.6 degrees per tick
         // this is needed because the gyro simulator doesn't update rates/angles on its own
         if(Robot.isSimulation()) {
-            gyro_sim.setAngle((r * 3.6) + gyro.getAngle());
-            gyro_sim.setRate(r * 180);
+            // gyro_sim.setAngle((r * 3.6) + gyro.getAngle());
+            // gyro_sim.setRate(r * 180);
         }
+
+        SmartDashboard.putNumber("left rear motor speed", left_rear.get());
+        SmartDashboard.putNumber("left rear motor position", lr_encoder.getPosition());
     }
 
     public void stop() {
@@ -179,13 +202,13 @@ public class DriveSubsystem extends SubsystemBase {
         // @@ Read wheel velocities - I noticed that getVelocity() seems to ignore
         // the conversion factors we set earlier, so we're multiplying it here again
         MecanumDriveWheelSpeeds wheelspeeds = new MecanumDriveWheelSpeeds(
-            lf_encoder.getVelocity() * velocity_multiplier,
-            rf_encoder.getVelocity() * velocity_multiplier,
-            lr_encoder.getVelocity() * velocity_multiplier,
-            rr_encoder.getVelocity() * velocity_multiplier
+            lf_encoder.getVelocity(),
+            rf_encoder.getVelocity(),
+            lr_encoder.getVelocity(),
+            rr_encoder.getVelocity()
         );
         // @@ With our wheel speeds and our gyro rotation, update our position in the odometry object
-        m_pose = m_odometry.update(gyro.getRotation2d(), wheelspeeds);
+        m_pose = m_odometry.update(getGyroAngle(), wheelspeeds);
         // @@ Update the field object for sim/shuffleboard visualization, and show our estimated positions
         field.setRobotPose(m_pose);
         SmartDashboard.putData(field);
@@ -196,5 +219,22 @@ public class DriveSubsystem extends SubsystemBase {
     public void simulationPeriodic() {
         // @@ Run the REV physics sim for the Spark MAX's - this only runs during robot simulation
         REVPhysicsSim.getInstance().run();
+    }
+
+    public void setPID(double kp, double ki, double kd) {
+        lf_PID.setP(kp);
+        rf_PID.setP(kp);
+        lr_PID.setP(kp);
+        rr_PID.setP(kp);
+
+        lf_PID.setI(ki);
+        rf_PID.setI(ki);
+        lr_PID.setI(ki);
+        rr_PID.setI(ki);
+
+        lf_PID.setD(kd);
+        rf_PID.setD(kd);
+        lr_PID.setD(kd);
+        rr_PID.setD(kd);
     }
 }

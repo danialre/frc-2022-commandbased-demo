@@ -32,7 +32,7 @@ public class RobotContainer {
 
     /***** DRIVER INPUTS *****/
     // ## Define our Joystick/controller, on port 0 (first port)
-    private final PS4Controller main_joystick = new PS4Controller(0);
+    private final XboxController main_joystick = new XboxController(0);
 
     // ## We can also define buttons here
     private final JoystickButton forwardButton = new JoystickButton(main_joystick, Constants.Buttons.FORWARD_BUTTON);

@@ -17,10 +17,16 @@ public final class Constants {
     // ## I made this class so PWM IDs on the RoboRIO are all in one place
     // (that way we don't accidentally swap or double assign motor controllers)
     public static class PWM_IDs {
-        public static final int LEFT_FRONT = 1;
-        public static final int RIGHT_FRONT = 2;
+        public static final int LEFT_FRONT = 4;
+        public static final int RIGHT_FRONT = 1;
         public static final int LEFT_REAR = 3;
-        public static final int RIGHT_REAR = 4;
+        public static final int RIGHT_REAR = 2;
+    }
+    
+    public static class DriveTrain {
+        public static final double wheelDiameter = 0.1524;
+        public static final double velocityConversionRatio = ((wheelDiameter * Math.PI)/(10.71 * 60));
+        public static final double positionConversionRation = ((wheelDiameter * Math.PI)/10.71);
     }
 
     // ## Let's also keep buttons in one place so it's easy to keep track of them

@@ -11,7 +11,7 @@ import com.revrobotics.SparkMaxPIDController;
 public class CANSparkMaxVelocityPID extends CANSparkMax {
     // reasonable maximum velocity this should run at - this will be a little less than free speed of the motor
     // note we're not setting free speed here, because the robot has mass
-    private final int MAX_VELOCITY_RPM = 4000;
+    private final int MAX_VELOCITY_RPM = 1000;
 
     // replicate set/get API from CANSparkMax - the m_setpoint inside the CANSparkMax 
     // class is private so we can't use that one here
